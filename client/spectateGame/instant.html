@@ -1,0 +1,101 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+	<title>Connect 4 Multiplayer</title>
+	<script src = "../lib/jquery-3.1.1.min.js"></script>
+	<script src = "../lib/lodash.min.js"></script>
+	<script src = "../lib/knockout-3.4.1.js"></script>
+	<script src = "../lib/knockout.mapping-latest.js"></script>
+	<script src = "../lib/socket.io-1.4.5.js"></script>
+	<script src = "../lib/jqPlugins.js"></script>
+	<script src = "client.js"></script>
+	<script>
+		function afterApply(){
+			model.playerSetup.username($.QueryString.gameId);
+			model.playerSetup.createConnection()
+		}
+	</script>
+	<link href="https://fonts.googleapis.com/css?family=Open+Sans:400,700" rel="stylesheet">
+	<link rel = "stylesheet" href = "../lib/bootstrap.min.css">
+	<link rel = "stylesheet" href = "../lib/bootstrap-theme.min.css">
+	<link rel = "stylesheet" href = "game.css">
+</head>
+<body>
+<div class = "main-parent" data-bind="visible:browserIsChrome">
+	<div class = "sidebar-parent">
+		<div class = "player-setup box-side">
+			<strong>Game Id:</strong> <input  class = "playerSetup-input" data-bind = "textInput:playerSetup.gameId"><br />
+			<strong>Username:</strong> <input class = "playerSetup-input" data-bind = "textInput:playerSetup.username"><br />
+
+		</div>
+		<div class = "game-info box-side" data-bind = "visible:clientReady">
+			<span class = "title-item">Game Info</span> <br />
+			<strong>Game Name: </strong><span data-bind = "text:gameInfo.gameName"></span><br />
+			<strong>Board Size: </strong><span data-bind = "text:gameInfo.boardSize"></span><br />
+			<strong>How many must be connected: </strong><span data-bind = "text:gameInfo.connect"></span><br />
+			<strong>Keep playing after a player wins: </strong><span data-bind = "text:gameInfo.keepPlaying"></span><br />
+			<span data-bind = "visible:!game.gameStarted()"><strong>Shareable Link: </strong><span data-bind = "text:gameInfo.shareLink"></span></span><br />
+			<strong>Shareable Spectator Link: </strong><span data-bind = "text:gameInfo.shareSpecLink"></span><br />
+		</div>
+		<div class = "box-side player-spec-list" data-bind = "visible:clientReady">
+			<span class = "title-item-s" >Players</span> <br />
+			<div class = "plist">
+				<!-- ko foreach: players -->
+				<div class = "user-in-list">
+					<span data-bind = "text:username"></span>
+					(Player <span data-bind="text:number"></span>)
+					<div class ="colorbox" data-bind = "style:{'background-color':color}"></div>
+
+				</div>
+				<!-- /ko -->
+			</div>
+			<span class = "title-item-s" >Spectators</span> <br />
+			<div class = "plist">
+				<!-- ko foreach: spectators -->
+				<div class = "user-in-list">
+					<span data-bind = "text:username"></span>
+				</div>
+				<!-- /ko -->
+			</div>
+		</div>
+		<div class  = "chat-box box-side" data-bind = "visible:clientReady">
+			<span class = "title-item" >Chat</span> <br />
+			<form data-bind = "submit:chat.sendChatMessage">
+				<strong data-bind = "text:playerSetup.username"></strong><br />
+				<input data-bind= "textInput:chat.chatInput,enable:chat.canSendMessage">
+				<input type = "submit" style ="display:none">
+			</form>
+			<div class = "chat-log-parent">
+				<!-- ko foreach: chat.chatLog -->
+				<div class = "chat-message-parent">
+					<span data-bind = "text:sender"></span> : <span data-bind = "text:message"></span>
+				</div>
+				<!-- /ko -->
+			</div>
+
+		</div>
+		<span class = "license">Copyright © 2017 flubb / flubbateios.com - <strong><a href = "../license.html" target = "_blank">License</a></strong> (Opens in a new tab)</span>
+	</div>
+	<div class = "game" data-bind = "style:{ 'background-color':game.emptyColor }">
+		<div class = "board-parent">
+			<!-- ko foreach: game.board -->
+			<div class = "board-col" data-bind="style:{width:$root.game.pieceSize()+'px'}">
+				<!-- ko foreach: arr -->
+				<div class = "board-square" data-bind = "style:{'background-color':(pieceVisible() ? color() : $root.game.emptyColor()), width: $root.game.pieceSize()+'px', height: $root.game.pieceSize()+'px' },attr:{id:'piece_'+x()+'_'+y()}">
+					<img class = "board-bg" src = "../deps/c4square.png">
+				</div>
+				<!-- /ko -->
+			</div>
+			<!-- /ko -->
+		</div>
+		<div class = "animation-mask">
+		</div>
+	</div>
+</div>
+<div data-bind="visible:!browserIsChrome()">
+	This application has <b>ONLY</b> been tested on Chrome. Other browsers may give unreliable results<br />
+	Click <button class = "btn btn-warning" data-bind = "click:function(){browserIsChrome(true)}">HERE</button> to continue.
+</div>
+</body>
+</html>

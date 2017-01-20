@@ -1,0 +1,43 @@
+body{
+    margin:0px;
+    background-color:#ededed;
+    font-family: 'Open Sans', sans-serif;
+}
+.main-cont{
+    border:gray 3px solid;
+    border-radius:7px;
+    width:450px;
+    height:600px;
+    margin-left:calc( (100vw - 450px) / 2);
+    margin-right:calc( (100vw - 450px) / 2);
+    margin-top:8vh;
+    padding:10px;
+    background-color:#9ab9ea;
+
+}
+input {
+    outline:none;
+    padding:3px;
+    margin-bottom:10px;
+    border-radius:5px;
+    width:420px;
+}
+h1{
+    text-align:center
+}
+#createGameButton{
+    margin-top:20px;
+    margin-left:auto;
+    margin-right:auto;
+    width:150px;
+    text-align:center;
+    display:block;
+}
+#joinGameButton{
+    margin-top:20px;
+    margin-left:auto;
+    margin-right:auto;
+    width:150px;
+    text-align:center;
+    display:block;
+}
