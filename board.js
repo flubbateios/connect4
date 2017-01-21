@@ -23,7 +23,7 @@ var board = function (w, h, c) {
 		for (var player in self.players) {
 			var p = self.players[player];
 			for (var x = 0; x < self.boardWidth; x++) {
-				for (var y = 0; y < (self.boardHeight - m); y++) {
+				for (var y = 0; y <= (self.boardHeight - m); y++) {
 					for (var z = 0; z < m; z++) {
 						if (self.board[x][y + z] != p) {
 							break;
@@ -44,7 +44,7 @@ var board = function (w, h, c) {
 		for (var player in self.players) {
 			var p = self.players[player];
 			for (var x = 0; x < (self.boardWidth - m); x++) {
-				for (var y = 0; y < (self.boardHeight); y++) {
+				for (var y = 0; y <= (self.boardHeight); y++) {
 					for (var z = 0; z < m; z++) {
 						if (self.board[x + z][y] != p) {
 							break;
@@ -66,7 +66,7 @@ var board = function (w, h, c) {
 		for (var player in self.players) {
 			var p = self.players[player];
 			for (var x = 0; x < (self.boardWidth - m); x++) {
-				for (var y = 0; y < (self.boardHeight - m); y++) {
+				for (var y = 0; y <= (self.boardHeight - m); y++) {
 					for (var z = 0; z < m; z++) {
 						if (self.board[x + z][y + z] != p) {
 							break;
@@ -87,7 +87,7 @@ var board = function (w, h, c) {
 		for (var player in self.players) {
 			var p = self.players[player];
 			for (var x = (m - 1); x < self.boardWidth; x++) {
-				for (var y = 0; y < (self.boardHeight - m); y++) {
+				for (var y = 0; y <= (self.boardHeight - m); y++) {
 					for (var z = 0; z < m; z++) {
 						if (self.board[x - z][y + z] != p) {
 							break;

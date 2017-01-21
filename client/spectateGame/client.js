@@ -8,7 +8,8 @@ var model = new (function (rootUrl) {
 	var self = this;
 	self.rootUrl = ko.observable(rootUrl);
 	self.browserIsChrome = ko.observable(!!window.chrome && !!window.chrome.webstore);
-	self.socket = io(self.rootUrl(), {path: '/server'});
+	var path = self.rootUrl().split(window.location.origin)[1]+'/server';
+	self.socket = io(window.location.origin, {path: path});
 	self.playerInfo = ko.observable();
 	self.playerSetup = {};
 	self.playerSetup.username = ko.observable('john cena');
@@ -17,7 +18,7 @@ var model = new (function (rootUrl) {
 	self.playerSetup.inSetup = ko.observable(true);
 	self.playerSetup.createConnection = function () {
 		if (self.socket.disconnected) {
-			//window.location.reload(true);
+			window.location.reload(true);
 		}
 
 		self.playerSetup.inSetup(false);
@@ -36,7 +37,7 @@ var model = new (function (rootUrl) {
 		});
 		self.socket.on('join-game', function (data) {
 			if (data.error == 'no-game-with-id') {
-				window.location.href = self.rootUrl() + '/spectateGame';
+				window.location.href = self.rootUrl() + '/spectateGame/';
 			}
 		});
 	};
