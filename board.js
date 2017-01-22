@@ -43,13 +43,12 @@ var board = function (w, h, c) {
 	self.checkAllHoriz = function () {
 		for (var player in self.players) {
 			var p = self.players[player];
-			for (var x = 0; x < (self.boardWidth - m); x++) {
-				for (var y = 0; y <= (self.boardHeight); y++) {
+			for (var x = 0; x <= (self.boardWidth - m); x++) {
+				for (var y = 0; y < (self.boardHeight); y++) {
 					for (var z = 0; z < m; z++) {
 						if (self.board[x + z][y] != p) {
 							break;
 						}
-						;
 						if (z == (m - 1)) {
 							return p;
 						}
@@ -65,7 +64,7 @@ var board = function (w, h, c) {
 	self.checkAllDiagRight = function () {
 		for (var player in self.players) {
 			var p = self.players[player];
-			for (var x = 0; x < (self.boardWidth - m); x++) {
+			for (var x = 0; x <= (self.boardWidth - m); x++) {
 				for (var y = 0; y <= (self.boardHeight - m); y++) {
 					for (var z = 0; z < m; z++) {
 						if (self.board[x + z][y + z] != p) {
@@ -92,7 +91,6 @@ var board = function (w, h, c) {
 						if (self.board[x - z][y + z] != p) {
 							break;
 						}
-						;
 						if (z == (m - 1)) {
 							return p;
 						}

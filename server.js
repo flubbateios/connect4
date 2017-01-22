@@ -56,7 +56,6 @@ var c4game = function (w, h, c, id, keepPlaying, gameName, selfdestruct) {
 		self.sendInfoToAll('gameOver');
 		self.sendServerMessage('Game Over.');
 		self.gameOver = true;
-		self.destroyGame();
 	};
 	self.destroyGame = function () {
 		for (var x in self.players) {
@@ -194,7 +193,7 @@ var c4game = function (w, h, c, id, keepPlaying, gameName, selfdestruct) {
 		}
 		spectator.username = data.username;
 		spectator.username = spectator.username.substring(0, 24);
-		spectator.username = !(_.includes(names, data.username)) ? data.username : self.generator.genUnique(16);
+		spectator.username = !(_.includes(names, spectator.username)) ? spectator.username : self.generator.genUnique(16);
 		spectator.type = 'spectator';
 		spectator.socket = sock;
 		spectator.returnable = {
@@ -305,7 +304,7 @@ var c4game = function (w, h, c, id, keepPlaying, gameName, selfdestruct) {
 	};
 
 	self.attemptMove = function (data, player) {
-		if (self.gameReady) {
+		if (self.gameReady && !self.gameOver) {
 			data.col = parseInt(data.col);
 			if (!(self.board.isTurn(player.number))) {
 				return {error: "not-your-move", success: false};
@@ -358,8 +357,12 @@ var c4game = function (w, h, c, id, keepPlaying, gameName, selfdestruct) {
 				var player = self.board.players[x];
 				if (!_.includes(self.winners, player)) {
 					self.winners.push('player');
+					
 				}
 			}
+		}
+		if(self.board.getPlayedSquares() == (self.board.boardWidth * self.board.boardHeight)){
+			self.sendServerMessage("It's a draw!");
 		}
 		if (self.winners.length == self.originalPlayers) {
 			self.sendInfoToAll('board',self.board.board);

@@ -24,8 +24,9 @@
 			<strong>Color : </strong><input class = "playerSetup-input" style = "width:40px" type = "color" data-bind= "textInput:playerSetup.color,enable:playerSetup.inSetup"><br />
 			<strong>Number :</strong> <input disabled style = "width:50px" class = "playerSetup-input" data-bind= "textInput:playerSetup.number"><br />
 			<strong>Host :</strong> <input disabled style = "width:50px" class = "playerSetup-input" data-bind= "textInput:playerSetup.isHost() ? 'Yes' : 'No'"><br />
-			<button class = "playerSetup-button btn btn-success" data-bind = "click:playerSetup.createConnection,visible:playerSetup.inSetup">Join Game</button>
-			<button class = "start-game-btn btn btn-primary" data-bind = "visible:(playerSetup.isHost() && clientReady() && !game.gameStarted()), click:game.startGame">Start Game</button>
+			<button class = "playerSetup-button btn btn-success" data-bind = "click:playerSetup.createConnection,visible:playerSetup.inSetup">Join Game</button><br />
+			<button class = "start-game-btn btn btn-primary" data-bind = "visible:(playerSetup.isHost() && clientReady() && !game.gameStarted()), click:game.startGame">Start Game</button><br />
+			<strong data-bind = "visible:game.gameStarted">Fast Animation?</strong><input type = "checkbox" data-bind = "checked:game.fastAnims, visible:game.gameStarted"><br />
 		</div>
 		<div class = "game-info box-side" data-bind = "visible:clientReady">
 			<span class = "title-item">Game Info</span> <br />
@@ -54,6 +55,13 @@
 				<div class = "user-in-list">
 					<span data-bind = "text:username"></span>
 				</div>
+				<!-- /ko -->
+			</div>
+			<span data-bind = "visible:game.gameStarted" class = "title-item-s" >Playing</span> <br />
+			<div class = "turn" data-bind = "visible:game.gameStarted">
+				<!-- ko with: game.playerTurn -->
+				<span data-bind = "text:username"></span>
+				<div class ="colorbox" data-bind = "style:{'background-color':color}"></div>
 				<!-- /ko -->
 			</div>
 		</div>

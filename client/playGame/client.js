@@ -49,8 +49,10 @@ var model = new (function (rootUrl) {
 		});
 	};
 	self.chat = {};
+	self.chat.chatLog = ko.observableArray([{sender: 'Info', message: 'Chat loading...'}]);
+	self.chat.chatInput = ko.observable('');
+	self.chat.canSendMessage = ko.observable(true);
 	self.chat.setupChat = function () {
-
 		self.socket.on('chatLog', function (data) {
 			var logWithInfo = data;
 			for (var x in self.chat.chatLog()) {
@@ -59,7 +61,6 @@ var model = new (function (rootUrl) {
 					logWithInfo.push(item);
 				}
 			}
-
 			self.chat.chatLog(logWithInfo);
 		});
 		self.socket.emit('requestChatLog');
@@ -70,11 +71,11 @@ var model = new (function (rootUrl) {
 			var slst = self.chat.chatLog().length - 2;
 			$('.chat-message-parent').get(slst).scrollIntoView(true);
 		});
+		self.chat.chatLog.subscribe(function(){
+			new Audio(self.rootUrl()+'/deps/message.mp3').play();
+		});
 		self.socket.emit('requestInfo');
 	};
-	self.chat.chatLog = ko.observableArray([{sender: 'Info', message: 'Chat loading...'}]);
-	self.chat.chatInput = ko.observable('');
-	self.chat.canSendMessage = ko.observable(true);
 	self.chat.sendChatMessage = function () {
 		self.chat.canSendMessage(false);
 		self.socket.emit('sendChatMessage', {message: self.chat.chatInput()});
@@ -164,6 +165,8 @@ var model = new (function (rootUrl) {
 	self.game.piecePart = ko.observable(1);
 	self.game.pieceSize = ko.observable(1);
 	self.game.emptyColor = ko.observable('#dc6e6e');
+	self.game.fastAnims = ko.observable(false);
+	self.game.playerTurn = {color:ko.observable('#ffffff'),username:ko.observable('???')};
 	self.game.rawBoardOld = [];
 	self.spectators = ko.observableArray();
 	self.players = ko.observableArray();
@@ -237,8 +240,8 @@ var model = new (function (rootUrl) {
 		self.game.gameWidth(bw);
 		self.game.gameHeight(bh);
 		self.game.pieceSize(ps);
-		game.css('width', '');
-		game.css('height', '');
+		game.css('width', 'auto');
+		game.css('height', 'auto');
 
 	};
 	self.game.animatePiece =function(x,y){
@@ -253,7 +256,7 @@ var model = new (function (rootUrl) {
 		anim_piece.css('background-color',self.game.board()[x].arr()[y].color());
 		$('.animation-mask').append(anim_piece);
 		var dist = self.gameInfo.rawData.boardHeight() - y;
-		var time = 92*dist;
+		var time = (self.game.fastAnims() ? 30 : 92)*dist;
 		var after_anim = function(){
 			self.game.board()[x].arr()[y].pieceVisible(true);
 			anim_piece.remove();
@@ -290,6 +293,22 @@ var model = new (function (rootUrl) {
 			self.game.animatePiece(piece.x,piece.y);
 		}
 		self.game.rawBoardOld = newboard;
+		self.game.getPlayerTurn();
+	};
+	self.game.getPlayerTurn = function(){
+		var playedSquares = 0;
+		for (var x in self.game.rawBoardOld) {
+			for (var y in self.game.rawBoardOld[x]) {
+				if (self.game.rawBoardOld[x][y] != 0) {
+					playedSquares += 1;
+				}
+			}
+		}
+		var turn = (playedSquares % self.players().length);
+		console.log(turn);
+		var player = self.players()[turn];
+		self.game.playerTurn.color(player.color());
+		self.game.playerTurn.username(player.username());
 	};
 	self.game.makeMove = function(col){
 		self.socket.emit('move',{col:col});
@@ -341,7 +360,10 @@ var model = new (function (rootUrl) {
 		});
 		self.socket.on('youWon',function(){
 			console.log('win');
-			window.location.href = self.rootUrl() + '/spectateGame/instant.html?' + $.param({gameId:self.playerSetup.gameId(),username:self.playerSetup.username()});
+			if(self.players().length > 1){
+				window.location.href = self.rootUrl() + '/spectateGame/instant.html?' + $.param({gameId:self.playerSetup.gameId(),username:self.playerSetup.username()});
+			}
+
 		});
 		self.socket.on('permPlayers',function(data){
 			var convdata = ko.mapping.fromJS(data);

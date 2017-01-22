@@ -12,7 +12,7 @@
 	<script src = "client.js"></script>
 	<script>
 		function afterApply(){
-			model.playerSetup.username($.QueryString.gameId);
+			model.playerSetup.username($.QueryString.username);
 			model.playerSetup.createConnection()
 		}
 	</script>
@@ -27,7 +27,7 @@
 		<div class = "player-setup box-side">
 			<strong>Game Id:</strong> <input  class = "playerSetup-input" data-bind = "textInput:playerSetup.gameId"><br />
 			<strong>Username:</strong> <input class = "playerSetup-input" data-bind = "textInput:playerSetup.username"><br />
-
+			<strong data-bind = "visible:game.gameStarted">Fast Animation?</strong><input type = "checkbox" data-bind = "checked:game.fastAnims, visible:game.gameStarted"><br />
 		</div>
 		<div class = "game-info box-side" data-bind = "visible:clientReady">
 			<span class = "title-item">Game Info</span> <br />
@@ -56,6 +56,13 @@
 				<div class = "user-in-list">
 					<span data-bind = "text:username"></span>
 				</div>
+				<!-- /ko -->
+			</div>
+			<span data-bind = "visible:game.gameStarted" class = "title-item-s" >Playing</span> <br />
+			<div class = "turn" data-bind = "visible:game.gameStarted">
+				<!-- ko with: game.playerTurn -->
+				<span data-bind = "text:username"></span>
+				<div class ="colorbox" data-bind = "style:{'background-color':color}"></div>
 				<!-- /ko -->
 			</div>
 		</div>
