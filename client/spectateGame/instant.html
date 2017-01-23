@@ -84,8 +84,8 @@
 		</div>
 		<span class = "license">Copyright © 2017 flubb / flubbateios.com - <strong><a href = "../license.html" target = "_blank">License</a></strong> (Opens in a new tab)</span>
 	</div>
-	<div class = "game" data-bind = "style:{ 'background-color':game.emptyColor }">
-		<div class = "board-parent">
+	<div class = "game" data-bind = "style:{height:game.gameHeight()+'px',width:game.gameWidth()+'px'}">
+		<div class = "board-parent" data-bind = "style:{height:game.gameHeight()+'px',width:game.gameWidth()+'px',$root.height:game.gameHeight()+'px'}">
 			<!-- ko foreach: game.board -->
 			<div class = "board-col" data-bind="style:{width:$root.game.pieceSize()+'px'}">
 				<!-- ko foreach: arr -->

@@ -229,10 +229,10 @@ var model = new (function (rootUrl) {
 	};
 	self.game.updateBoardSize = function () {
 		var game = $('.game');
-		game.css('width', '100vw');
-		game.css('height', '100vh');
-		var gw = game.width() / self.gameInfo.rawData.boardWidth();
-		var gh = game.height() / self.gameInfo.rawData.boardHeight();
+		var mw = $(window).width() - (game.outerWidth(true) - game.outerWidth()) - $('.sidebar-parent').outerWidth(true);
+		var mh = $(window).height() - (game.outerHeight(true) - game.outerHeight());
+		var gw = mw / self.gameInfo.rawData.boardWidth();
+		var gh = mh / self.gameInfo.rawData.boardHeight();
 		var ps = Math.min(gw, gh);
 		var bw = self.gameInfo.rawData.boardWidth() * ps;
 		var bh = self.gameInfo.rawData.boardHeight() * ps;
@@ -296,19 +296,7 @@ var model = new (function (rootUrl) {
 		self.game.getPlayerTurn();
 	};
 	self.game.getPlayerTurn = function(){
-		var playedSquares = 0;
-		for (var x in self.game.rawBoardOld) {
-			for (var y in self.game.rawBoardOld[x]) {
-				if (self.game.rawBoardOld[x][y] != 0) {
-					playedSquares += 1;
-				}
-			}
-		}
-		var turn = (playedSquares % self.players().length);
-		console.log(turn);
-		var player = self.players()[turn];
-		self.game.playerTurn.color(player.color());
-		self.game.playerTurn.username(player.username());
+		self.socket.emit('requestTurn')
 	};
 	self.game.makeMove = function(col){
 		self.socket.emit('move',{col:col});
@@ -336,6 +324,7 @@ var model = new (function (rootUrl) {
 			self.socket.emit('requestPlayers');
 			self.socket.emit('requestSpectators');
 			self.socket.emit('requestPermPlayers');
+			self.socket.emit('requestTurn');
 			self.game.gameStarted(true);
 		});
 		self.socket.on('players', function (data) {
@@ -368,6 +357,11 @@ var model = new (function (rootUrl) {
 		self.socket.on('permPlayers',function(data){
 			var convdata = ko.mapping.fromJS(data);
 			self.permPlayers(convdata());
+		});
+		self.socket.on('turn',function(data){
+			var player = self.playersMap()[data.toString()];
+			self.game.playerTurn.username(player.username());
+			self.game.playerTurn.color(player.color());
 		});
 
 	};

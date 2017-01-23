@@ -79,10 +79,10 @@
 		</div>
 		<span class = "license">Copyright © 2017 flubb / flubbateios.com - <strong><a href = "../license.html" target = "_blank">License</a></strong> (Opens in a new tab)</span>
 	</div>
-	<div class = "game" data-bind = "style:{ 'background-color':game.emptyColor }">
-		<div class = "board-parent">
+	<div class = "game" data-bind = "style:{height:game.gameHeight()+'px',width:game.gameWidth()+'px'}">
+		<div class = "board-parent" data-bind = "style:{height:game.gameHeight()+'px',width:game.gameWidth()+'px'}">
 			<!-- ko foreach: game.board -->
-			<div class = "board-col" data-bind="style:{width:$root.game.pieceSize()+'px'}">
+			<div class = "board-col" data-bind="style:{width:$root.game.pieceSize()+'px',height:$root.game.gameHeight()+'px'}">
 				<!-- ko foreach: arr -->
 				<div class = "board-square" data-bind = "style:{'background-color':(pieceVisible() ? color() : $root.game.emptyColor()), width: $root.game.pieceSize()+'px', height: $root.game.pieceSize()+'px' },attr:{id:'piece_'+x()+'_'+y()}">
 					<img class = "board-bg" src = "../deps/c4square.png">

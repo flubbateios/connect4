@@ -79,10 +79,10 @@ var c4game = function (w, h, c, id, keepPlaying, gameName, selfdestruct) {
 		}
 		player.type = 'player';
 
-		var rndcolor = utilities.roundHTMLColor(randomcolor(),20);
+		var rndcolor = utilities.roundHTMLColor(randomcolor(),30);
 
 		player.color = /^#[0-9A-F]{6}$/i.test(player.color) ? player.color : rndcolor;
-		player.color = utilities.roundHTMLColor(player.color,20);
+		player.color = utilities.roundHTMLColor(player.color,30);
 		player.color = !(_.includes(colors, data.color)) ? (data.color) : rndcolor;
 		player.username = !(_.includes(names, data.username)) ? (data.username || self.generator.genUnique(16)) : self.generator.genUnique(16);
 		//player.username = html_escape(player.username);
@@ -169,6 +169,9 @@ var c4game = function (w, h, c, id, keepPlaying, gameName, selfdestruct) {
 		});
 		player.socket.on('requestPermPlayers',function(){
 			player.socket.emit('permPlayers',self.permPlayers)
+		});
+		player.socket.on('requestTurn',function(){
+			player.socket.emit('turn',self.board.getPlayerTurn())
 		});
 
 	};
@@ -257,7 +260,10 @@ var c4game = function (w, h, c, id, keepPlaying, gameName, selfdestruct) {
 		});
 		spec.socket.on('requestPermPlayers',function(){
 			spec.socket.emit('permPlayers',self.permPlayers)
-		})
+		});
+		spec.socket.on('requestTurn',function(){
+			spec.socket.emit('turn',self.board.getPlayerTurn())
+		});
 
 	};
 
@@ -286,11 +292,7 @@ var c4game = function (w, h, c, id, keepPlaying, gameName, selfdestruct) {
 		self.sendInfoToAll('chatMessage', msg);
 	};
 	self.filterChatMessage = function (msg) {
-		if (!msg.message) {
-			return false;
-		}
-		var toolong = msg.message.length <= 256;
-		return !!toolong;
+		return (msg.message.length <= 256) && msg.message;
 
 	};
 	self.sendServerMessage = function (message) {
