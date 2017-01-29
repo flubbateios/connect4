@@ -9,12 +9,12 @@ var model = new (function (rootUrl) {
 	self.rootUrl = ko.observable(rootUrl);
 	self.browserIsChrome = ko.observable(!!window.chrome && !!window.chrome.webstore);
 	var path = self.rootUrl().split(window.location.origin)[1]+'/server';
-	self.socket = io(window.location.origin, {path: path});
+	self.socket = io(window.location.origin, {path: path,reconnect:true});
 	self.playerInfo = ko.observable();
 	self.playerSetup = {};
-	self.playerSetup.username = ko.observable('john cena');
-	self.playerSetup.color = ko.observable('#ffff00');
-	self.playerSetup.gameId = !!$.QueryString.gameId ? ko.observable($.QueryString.gameId) : ko.observable('48 character game Id');
+	self.playerSetup.username = ko.observable('xXx_d@nk_m3m3st3r420_xXx');
+	self.playerSetup.color = ko.observable('#4cc62c');
+	self.playerSetup.gameId = !!$.QueryString.gameId ? ko.observable($.QueryString.gameId) : ko.observable('666666');
 	self.playerSetup.gameIdDisabled = ko.observable(!!$.QueryString.gameId);
 	self.playerSetup.inSetup = ko.observable(true);
 	self.playerSetup.number = ko.observable('');
@@ -49,7 +49,7 @@ var model = new (function (rootUrl) {
 		});
 	};
 	self.chat = {};
-	self.chat.chatLog = ko.observableArray([{sender: 'Info', message: 'Chat loading...'}]);
+	self.chat.chatLog = ko.observableArray([]);
 	self.chat.chatInput = ko.observable('');
 	self.chat.canSendMessage = ko.observable(true);
 	self.chat.setupChat = function () {
@@ -67,12 +67,9 @@ var model = new (function (rootUrl) {
 		self.socket.on('chatMessage', function (data) {
 			self.chat.chatLog.push(data);
 		});
-		self.socket.on('chatMessage', function (data) {
-			var slst = self.chat.chatLog().length - 2;
-			$('.chat-message-parent').get(slst).scrollIntoView(true);
-		});
 		self.chat.chatLog.subscribe(function(){
 			new Audio(self.rootUrl()+'/deps/message.mp3').play();
+			$('.chat-log-parent').scrollTop(self.chat.chatLog().length*500);
 		});
 		self.socket.emit('requestInfo');
 	};
@@ -95,15 +92,6 @@ var model = new (function (rootUrl) {
 		});
 		self.socket.on('gameConnected', function (d) {
 			self.chat.chatLog.push({message: 'Game joined with role ' + d.role, sender: 'Info'});
-		});
-		self.socket.on('join-game', function (d) {
-			if (d.success) {
-				self.chat.chatLog.push({message: 'Connected to Game.', sender: 'Info'});
-			} else if (d.error) {
-				self.chat.chatLog.push({message: 'Failed to connect to Game - Error: ' + d.error, sender: 'Info'});
-			} else {
-				self.chat.chatLog.push({message: 'Failed to connect for unknown reasons.', sender: 'Info'});
-			}
 		});
 		self.socket.on('chat-status', function (d) {
 			if (!d.success) {
@@ -129,7 +117,7 @@ var model = new (function (rootUrl) {
 			var boardSize = data.boardWidth + ' * ' + data.boardHeight;
 			self.gameInfo.boardSize(boardSize);
 			self.gameInfo.connect(data.connect);
-			var keepPlaying = data.keepPlaying ? 'Yes' : 'No';
+			var keepPlaying = data.keepPlaying;
 			self.gameInfo.keepPlaying(keepPlaying);
 			self.gameInfo.gameName(data.gameName);
 			var shareLink = self.rootUrl() + '/playGame/?gameId=' + data.gameId;
@@ -164,8 +152,10 @@ var model = new (function (rootUrl) {
 	self.game.gameHeight = ko.observable(1);
 	self.game.piecePart = ko.observable(1);
 	self.game.pieceSize = ko.observable(1);
-	self.game.emptyColor = ko.observable('#dc6e6e');
+	self.game.emptyColor = ko.observable('#E56151');
 	self.game.fastAnims = ko.observable(false);
+	self.game.gameOver = ko.observable(false);
+	self.game.boardOffset = ko.observable(60);
 	self.game.playerTurn = {color:ko.observable('#ffffff'),username:ko.observable('???')};
 	self.game.rawBoardOld = [];
 	self.spectators = ko.observableArray();
@@ -230,7 +220,7 @@ var model = new (function (rootUrl) {
 	self.game.updateBoardSize = function () {
 		var game = $('.game');
 		var mw = $(window).width() - (game.outerWidth(true) - game.outerWidth()) - $('.sidebar-parent').outerWidth(true);
-		var mh = $(window).height() - (game.outerHeight(true) - game.outerHeight());
+		var mh = $(window).height() - (game.outerHeight(true) - game.outerHeight()) - self.game.boardOffset();
 		var gw = mw / self.gameInfo.rawData.boardWidth();
 		var gh = mh / self.gameInfo.rawData.boardHeight();
 		var ps = Math.min(gw, gh);
@@ -251,6 +241,7 @@ var model = new (function (rootUrl) {
 		anim_piece.attr('class','piece-animation');
 		anim_piece.css('border-radius', pieceSize/2);
 		anim_piece.css('left',pos.left+self.game.piecePart()/2);
+		//anim_piece.css('top',self.game.boardOffset());
 		anim_piece.css('width',self.game.pieceSize()-self.game.piecePart());
 		anim_piece.css('height',self.game.pieceSize()-self.game.piecePart());
 		anim_piece.css('background-color',self.game.board()[x].arr()[y].color());
@@ -363,9 +354,18 @@ var model = new (function (rootUrl) {
 			self.game.playerTurn.username(player.username());
 			self.game.playerTurn.color(player.color());
 		});
+		self.socket.on('gameOver',function(){
+			self.game.gameOver(true)
+		});
 
 	};
-
+	self.links = {};
+	self.links.promptSpecLink = function(){
+		window.prompt('Copy this link and send it to your friends',self.gameInfo.shareSpecLink())
+	};
+	self.links.promptPlayLink = function(){
+		window.prompt('Copy this link and send it to your friends',self.gameInfo.shareLink())
+	};
 	self.clientReady = ko.observable(false);
 	self.setupClient = function () {
 		self.playerSetup.registerHandlers();

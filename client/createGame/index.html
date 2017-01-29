@@ -34,6 +34,14 @@
 	<br>
 	<input type = "checkbox" data-bind="checked:gameKeepPlaying" style = "width:auto">
 	<br>
+	<span>Is game public? (currently useless since there is no games browser yet)</span>
+	<br>
+	<input type = "checkbox" data-bind="checked:public.public" style = "width:auto">
+	<br>
+	<span>Password (only if game is public)</span>
+	<br>
+	<input data-bind="textInput:public.password, enable:public.public">
+	<br>
 	<button data-bind = "click:submitInfo" id = "createGameButton" class = "btn btn-success">Create Game</button>
 	<br>
 	<div id = "gameCreateStatus" data-bind = "html:gameCreateStatus" style = "word-wrap:break-word;text-align:center"></div>

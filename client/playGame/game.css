@@ -12,7 +12,6 @@
     height: 100vh;
     width: 25vw;
     max-width: 350px;
-
 }
 
 body {
@@ -20,6 +19,7 @@ body {
     background-color: #c1d9ff;
     font-family: 'Open Sans', sans-serif;
     font-size: 14px;
+	
 }
 
 .title-item {
@@ -36,6 +36,7 @@ input {
     outline: none;
     padding: 3px;
     border-radius: 5px;
+	color:#000000;
 }
 
 .playerSetup-input {
@@ -44,19 +45,23 @@ input {
 }
 
 .box-side {
-    border: 1px #ffffff solid;
     padding: 4px;
-    background-color: rgb(167, 169, 159);
+    background-color: #888888;
+    color:#ffffff;
     margin-bottom: 50px;
     word-wrap: break-word;
 }
 
 .plist {
-    height: 100px;
+    height: 130px;
     overflow-y: auto;
     overflow-x: visible;
 }
-
+.slist {
+    height: 70px;
+    overflow-y: auto;
+    overflow-x: visible;
+}
 .colorbox {
     width: 20px;
     height: 20px;
@@ -94,7 +99,7 @@ input {
 
 .chat-message-parent {
     border-top: 1px #b6b6b6 solid;
-    margin-top: 2px;
+    margin-top: 4px;
 }
 
 .game {
@@ -125,10 +130,30 @@ input {
 }
 
 .animation-mask {
-    position: static;
+    position: absolute;
     overflow: visible;
 }
 
 .piece-animation {
     position:absolute;
+}
+.game-info{
+    text-align:center;
+    font-weight:bold;
+    font-size:20px;
+}
+.game-info span{
+    display:inline-block;
+}
+.share-links{
+    margin-bottom:30px;
+}
+.share-links button{
+    width:100%;
+    margin-bottom:3px;
+    margin-top:3px;
+}
+.linkbutton{
+    display:block;
+    width:100%;
 }

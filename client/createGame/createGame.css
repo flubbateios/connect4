@@ -7,7 +7,7 @@ body{
     border:gray 3px solid;
     border-radius:7px;
     width:450px;
-    height:600px;
+    height:680px;
     margin-left:calc( (100vw - 450px) / 2);
     margin-right:calc( (100vw - 450px) / 2);
     margin-top:8vh;

@@ -8,7 +8,7 @@ var html_escape = require('escape-html');
 var bodyParser = require('body-parser');
 var randomcolor = require('randomcolor');
 var fs = require('fs');
-var c4game = function (w, h, c, id, keepPlaying, gameName, selfdestruct) {
+var c4game = function (w, h, c, id, keepPlaying, gameName, selfdestruct, public) {
 	var self = this;
 	self.keepPlaying = keepPlaying;
 	self.generator = new utilities.uGenerator();
@@ -17,6 +17,7 @@ var c4game = function (w, h, c, id, keepPlaying, gameName, selfdestruct) {
 	self.gameReady = false;
 	self.gameId = id;
 	self.gameName = gameName;
+	self.public = public;
 	self.spectators = [];
 	self.chatMessages = [];
 	self.winners = [];
@@ -35,7 +36,7 @@ var c4game = function (w, h, c, id, keepPlaying, gameName, selfdestruct) {
 		if(self.players.length == 0){
 			self.destroyGame();
 		}
-	},(60 * 1000));
+	},(80 * 1000));
 	self.lockGame = function () {
 		self.gameReady = true;
 		self.createPlayer = function (d, sock) {
@@ -66,7 +67,7 @@ var c4game = function (w, h, c, id, keepPlaying, gameName, selfdestruct) {
 	};
 	self.createPlayer = function (data, sock) {
 		var player = {};
-		var colors = ['#dc6e6e'];
+		var colors = ['#d25a3c'];
 		var names = ['Info','Server','info','server'];
 		for (var x in self.players) {
 			var pSelect = self.players[x];
@@ -80,7 +81,6 @@ var c4game = function (w, h, c, id, keepPlaying, gameName, selfdestruct) {
 		player.type = 'player';
 
 		var rndcolor = utilities.roundHTMLColor(randomcolor(),30);
-
 		player.color = /^#[0-9A-F]{6}$/i.test(player.color) ? player.color : rndcolor;
 		player.color = utilities.roundHTMLColor(player.color,30);
 		player.color = !(_.includes(colors, data.color)) ? (data.color) : rndcolor;
@@ -433,11 +433,13 @@ var c4serv = function (port,host,logfile) {
 	var self = this;
 	self.port = port;
 	self.host = host;
-	self.logfile = logfile;
+	self.logfile = logfile || false;
 	self.games = [];
+	self.publicGames = [];
+	self.publicGamesInfo =[];
 	self.app = express();
 	self.httpServer = http.createServer(self.app);
-
+	self.gameIdGen = new utilities.tempGenerator();
 	self.server = io(self.httpServer, {
 		path: '/server'
 	});
@@ -472,26 +474,40 @@ var c4serv = function (port,host,logfile) {
 				sock.emit('join-game', {error: "no-game-with-id", success: false});
 			}
 		});
+		sock.on('requestPublicGames',function(){
+			sock.emit('publicGames',self.publicGamesInfo);
+		})
 	});
 	self.createGame = function (data) {
 		var game;
-		function sd() {
+		var sd = function () {
 			self.removeGame(game);
-		}
+		};
 		var gameNames = [];
 		for(var x in self.games){
 			gameNames.push(self.games[x].gameName);
 		}
-		var realGameName = _.includes(gameNames,data.gameName) ? utilities.randomString(40) : data.gameName;
-		var gameId = utilities.randomString(48);
-		game = new c4game(data.width, data.height, data.connect, gameId, data.keepPlaying, realGameName, sd);
+		var realGameName = _.includes(gameNames,data.gameName) ? utilities.randomString(20) : data.gameName;
+		var gameId = self.gameIdGen.genUnique(6,'1234567890');
+		game = new c4game(data.width, data.height, data.connect, gameId, data.keepPlaying, realGameName, sd, data.public);
+		if(game.public.public){
+			self.publicGames.push({info:game.publicGameInfo,password:game.public.password,isPassworded:!!game.public.password});
+			self.publicGamesInfo.push({info:game.publicGameInfo,isPassworded:!!game.public.password});
+		}
 		self.games.push(game);
 		return game;
 	};
 	self.removeGame = function (game) {
 		var pos = self.games.indexOf(game);
 		if (pos > -1) {
+			self.gameIdGen.removeGen(game.gameId);
 			self.games.splice(pos, 1);
+			for(var x in self.publicGames){
+				if(self.publicGames[x].info == game.publicGameInfo){
+					self.publicGames.splice(x,1);
+					self.publicGamesInfo.splice(x,1);
+				}
+			}
 		}
 
 	};
@@ -503,15 +519,22 @@ var c4serv = function (port,host,logfile) {
 	self.app.post('/createGame/api',function(req,res){
 		var ip = req.headers['x-forwarded-for'] || req.connection.remoteAddress;
 		var timenow = Date.now();
-		fs.appendFileSync(self.logfile,'Game Create Request from: '+ip+'\n');
+		self.logfile && fs.appendFileSync(self.logfile,'Game Create Request from: '+ip+'\n');
 		var td = timenow - self.lastCreateGameRequest;
-		if(td > (1000 * 6)){
+		if(td > (1000 * 4)){
 			var data = req.body;
-			if((typeof data.width == 'number') && (typeof data.height == 'number') && (typeof data.connect == 'number') && (typeof data.keepPlaying == 'boolean') && (typeof data.gameName == 'string')){
-				data.width = Math.floor(data.width);
-				data.height = Math.floor(data.height);
-				data.connect = Math.floor(data.connect);
-				//data.gameName = html_escape(data.gameName);
+			var type_validation = (typeof data.width == 'number') && (typeof data.height == 'number') && (typeof data.connect == 'number') && (typeof data.keepPlaying == 'boolean') && (typeof data.gameName == 'string')&& (typeof data.public.password == 'string');
+			var number_validation = (data.width > 0) && (data.height > 0) && (data.connect > 0);
+			var validated = type_validation && number_validation;
+			if(validated){
+				data.width = Math.floor(data.width) || 7;
+				data.height = Math.floor(data.height) || 6;
+				data.connect = Math.floor(data.connect) || 4;
+				data.gameName = data.gameName.substring(0,24);
+				data.public.password = data.public.password.substring(0,16);
+				data.public.password = data.public.password || false;
+				data.public.public = !!data.public.public;
+				data.public = {public:data.public.public,password:data.public.password};
 				var gm = self.createGame(data);
 				res.json({success:true,gameInfo:gm.publicGameInfo});
 			}else{

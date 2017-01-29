@@ -6,15 +6,14 @@ var randomString = function (len, chars) {
 		ticket += s.charAt(Math.floor(Math.random() * s.length));
 	}
 	return ticket;
-
-}
+};
 var model = new function () {
 	var self = this;
 	self.rootUrl = window.location.href.split('/createGame')[0];
 	self.gameName = ko.observable('My Awesome game!');
 	self.gameName.subscribe(function (nv) {
-		if (nv.length > 48) {
-			self.gameName(nv.substring(0, 48));
+		if (nv.length > 24) {
+			self.gameName(nv.substring(0, 24));
 		}
 	});
 
@@ -83,6 +82,20 @@ var model = new function () {
 	});
 
 	self.gameKeepPlaying = ko.observable(false);
+	self.public = {
+		public:ko.observable(false),
+		password:ko.observable('')
+	};
+	self.public.public.subscribe(function(n){
+		if(!n){
+			self.public.password('');
+		}
+	});
+	self.public.password.subscribe(function(n){
+		if(n.length > 16){
+			self.public.password(n.substring(0,16));
+		}
+	});
 	self.gameCreateStatus = ko.observable('');
 	self.joinGameById = function(){
 		window.location.href = self.rootUrl + '/playGame/?gameId='+self.gameLink();
@@ -97,6 +110,7 @@ var model = new function () {
 		sendToServer.height = self.gameHeight() || 6;
 		sendToServer.connect = self.gameConnect() || 4;
 		sendToServer.keepPlaying = self.gameKeepPlaying();
+		sendToServer.public = {public:self.public.public(),password:self.public.password()};
 		$.ajax({
 			url: self.rootUrl+'/createGame/api',
 			error: function () {

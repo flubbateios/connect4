@@ -9,7 +9,7 @@ var randomString = function (len, chars) {
 	}
 	return ticket;
 
-}
+};
 
 var uGenerator = function () {
 	var self = this;
@@ -30,6 +30,31 @@ var uGenerator = function () {
 
 
 };
+var tempGenerator = function () {
+	var self = this;
+	self.generated = [];
+	self.genUnique = function (len, chars) {
+		var s = chars || "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
+		var ticket = "";
+		for (var x = 0; x < len; x++) {
+			ticket += s.charAt(Math.floor(Math.random() * s.length));
+		}
+		if(self.generated.includes(ticket)){
+			return self.genUnique(len,chars);
+		}else {
+			self.generated.push(ticket);
+			return ticket;
+		}
+	};
+	self.removeGen = function(d){
+		var i = self.generated.indexOf(d);
+		if(i>-1){
+			self.generated.splice(i,1);
+		}
+	}
+
+
+};
 var roundHTMLColor = function(color,prec){
 	var colors = [parseInt(color.substring(1,3),16),parseInt(color.substring(3,5),16),parseInt(color.substring(5,7),16)];
 	var new_color = '#';
@@ -44,3 +69,4 @@ var roundHTMLColor = function(color,prec){
 module.exports.uGenerator = uGenerator;
 module.exports.randomString = randomString;
 module.exports.roundHTMLColor = roundHTMLColor;
+module.exports.tempGenerator = tempGenerator;

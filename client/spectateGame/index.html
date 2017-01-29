@@ -24,14 +24,12 @@
 			<button class = "playerSetup-button btn btn-success" data-bind = "click:playerSetup.createConnection,visible:playerSetup.inSetup">Join Game</button> <br />
 			<strong data-bind = "visible:game.gameStarted">Fast Animation?</strong><input type = "checkbox" data-bind = "checked:game.fastAnims, visible:game.gameStarted"><br />
 		</div>
-		<div class = "game-info box-side" data-bind = "visible:clientReady">
-			<span class = "title-item">Game Info</span> <br />
-			<strong>Game Name: </strong><span data-bind = "text:gameInfo.gameName"></span><br />
-			<strong>Board Size: </strong><span data-bind = "text:gameInfo.boardSize"></span><br />
-			<strong>How many must be connected: </strong><span data-bind = "text:gameInfo.connect"></span><br />
-			<strong>Keep playing after a player wins: </strong><span data-bind = "text:gameInfo.keepPlaying"></span><br />
-			<span data-bind = "visible:!game.gameStarted()"><strong>Shareable Link: </strong><span data-bind = "text:gameInfo.shareLink"></span></span><br />
-			<strong>Shareable Spectator Link: </strong><span data-bind = "text:gameInfo.shareSpecLink"></span><br />
+		<div class ="box-side share-links" data-bind = "visible:clientReady">
+			<button class = "btn btn-primary" data-bind = "click:links.promptSpecLink">Shareable Spectator Link</button>
+			<button class = "btn btn-primary" data-bind = "click:links.promptPlayLink,visible:!game.gameStarted()">Shareable Player Link</button>
+			<a href = "../playGame/" class = "btn btn-success linkbutton" data-bind="visible:game.gameOver">Join Another Game</a>
+			<a href = "../spectateGame/" class = "btn btn-success linkbutton" data-bind="visible:game.gameOver">Spectate Another Game</a>
+			<a href = "../createGame/" class = "btn btn-success linkbutton" data-bind="visible:game.gameOver">Create Another Game</a>
 		</div>
 		<div class = "box-side player-spec-list" data-bind = "visible:clientReady">
 			<span class = "title-item-s" >Players</span> <br />
@@ -80,7 +78,11 @@
 		<span class = "license">Copyright © 2017 flubb / flubbateios.com - <strong><a href = "../license.html" target = "_blank">License</a></strong> (Opens in a new tab)</span>
 	</div>
 	<div class = "game" data-bind = "style:{height:game.gameHeight()+'px',width:game.gameWidth()+'px'}">
-		<div class = "board-parent" data-bind = "style:{height:game.gameHeight()+'px',width:game.gameWidth()+'px'}">
+		<div class = "game-info" data-bind = "style:{height:game.boardOffset()+'px',width:game.gameWidth()+'px'},visible:clientReady" >
+			<span data-bind = "text:gameInfo.gameName"></span><br />
+			<span data-bind = "text:gameInfo.boardSize()+' Connect'"></span> <span data-bind = "text:gameInfo.connect"></span> <span data-bind = "visible:gameInfo.keepPlaying">(Game will continue after one player wins)</span>
+		</div>
+		<div class = "board-parent" data-bind = "style:{height:game.gameHeight()+'px',width:game.gameWidth()+'px',top:game.boardOffset()+'px'}">
 			<!-- ko foreach: game.board -->
 			<div class = "board-col" data-bind="style:{width:$root.game.pieceSize()+'px',height:$root.game.gameHeight()+'px'}">
 				<!-- ko foreach: arr -->
