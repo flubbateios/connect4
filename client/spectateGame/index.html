@@ -10,13 +10,15 @@
 	<script src = "../lib/socket.io-1.4.5.js"></script>
 	<script src = "../lib/jqPlugins.js"></script>
 	<script src = "client.js"></script>
-	<link href="https://fonts.googleapis.com/css?family=Open+Sans:400,700" rel="stylesheet">
-	<link rel = "stylesheet" href = "../lib/bootstrap.min.css">
-	<link rel = "stylesheet" href = "../lib/bootstrap-theme.min.css">
+	<link href = "../lib/bootstrap.css" rel = "stylesheet">
 	<link rel = "stylesheet" href = "game.css">
 </head>
 <body>
 <div class = "main-parent" data-bind="visible:browserIsChrome">
+
+	<div class = "box-side">
+		<button class = "btn btn-info" style="width:100%" data-bind = "click:function(){window.location.href = rootUrl() + '/gamesBrowser/'}">Back to Games Browser</button>
+	</div>
 	<div class = "sidebar-parent">
 		<div class = "player-setup box-side">
 			<strong>Game Id:</strong> <input  class = "playerSetup-input" data-bind = "textInput:playerSetup.gameId , disable:playerSetup.gameIdDisabled()||!playerSetup.inSetup() "><br />
@@ -25,8 +27,8 @@
 			<strong data-bind = "visible:game.gameStarted">Fast Animation?</strong><input type = "checkbox" data-bind = "checked:game.fastAnims, visible:game.gameStarted"><br />
 		</div>
 		<div class ="box-side share-links" data-bind = "visible:clientReady">
-			<button class = "btn btn-primary" data-bind = "click:links.promptSpecLink">Shareable Spectator Link</button>
-			<button class = "btn btn-primary" data-bind = "click:links.promptPlayLink,visible:!game.gameStarted()">Shareable Player Link</button>
+			<button class = "btn btn-info" data-bind = "click:links.promptSpecLink">Shareable Spectator Link</button>
+			<button class = "btn btn-info" data-bind = "click:links.promptPlayLink,visible:!game.gameStarted()">Shareable Player Link</button>
 			<a href = "../playGame/" class = "btn btn-success linkbutton" data-bind="visible:game.gameOver">Join Another Game</a>
 			<a href = "../spectateGame/" class = "btn btn-success linkbutton" data-bind="visible:game.gameOver">Spectate Another Game</a>
 			<a href = "../createGame/" class = "btn btn-success linkbutton" data-bind="visible:game.gameOver">Create Another Game</a>

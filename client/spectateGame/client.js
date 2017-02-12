@@ -206,7 +206,7 @@ var model = new (function (rootUrl) {
 	};
 	self.game.updateBoardSize = function () {
 		var game = $('.game');
-		var mw = $(window).width() - (game.outerWidth(true) - game.outerWidth()) - $('.sidebar-parent').outerWidth(true);
+		var mw = $(window).width() - (game.outerWidth(true) - game.outerWidth()) - ($(window).width()*(25/100)>460 ? 460 :  $(window).width()*(25/100));
 		var mh = $(window).height() - (game.outerHeight(true) - game.outerHeight()) - self.game.boardOffset();
 		var gw = mw / self.gameInfo.rawData.boardWidth();
 		var gh = mh / self.gameInfo.rawData.boardHeight();
@@ -322,6 +322,9 @@ var model = new (function (rootUrl) {
 		});
 		self.socket.on('gameOver',function(){
 			self.game.gameOver(true);
+		});
+		self.players.subscribe(function(){
+			self.socket.emit('requestTurn')
 		});
 	};
 	self.links = {};

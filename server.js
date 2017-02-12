@@ -81,9 +81,13 @@ var c4game = function (w, h, c, id, keepPlaying, gameName, selfdestruct, public)
 		player.type = 'player';
 
 		var rndcolor = utilities.roundHTMLColor(randomcolor(),30);
+		player.color = data.color;
+		player.color = player.color.toLowerCase();
 		player.color = /^#[0-9A-F]{6}$/i.test(player.color) ? player.color : rndcolor;
 		player.color = utilities.roundHTMLColor(player.color,30);
-		player.color = !(_.includes(colors, data.color)) ? (data.color) : rndcolor;
+		player.color = !(_.includes(colors, player.color)) ? player.color : rndcolor;
+
+
 		player.username = !(_.includes(names, data.username)) ? (data.username || self.generator.genUnique(16)) : self.generator.genUnique(16);
 		//player.username = html_escape(player.username);
 		player.username = player.username.substring(0, 24);
@@ -180,6 +184,11 @@ var c4game = function (w, h, c, id, keepPlaying, gameName, selfdestruct, public)
 		player.returnable.isHost = true;
 		player.socket.on('lockGame',function(){
 			self.lockGame();
+		});
+		player.socket.on('kickPlayer',function(data){
+			if(!self.gameReady){
+				self.removePlayer(data);
+			}
 		});
 	};
 
@@ -429,7 +438,6 @@ var c4game = function (w, h, c, id, keepPlaying, gameName, selfdestruct, public)
 };
 
 var c4serv = function (port,host,logfile) {
-	//Global server
 	var self = this;
 	self.port = port;
 	self.host = host;
@@ -437,11 +445,13 @@ var c4serv = function (port,host,logfile) {
 	self.games = [];
 	self.publicGames = [];
 	self.publicGamesInfo =[];
+	self.publicGamesListeners=[];
 	self.app = express();
 	self.httpServer = http.createServer(self.app);
 	self.gameIdGen = new utilities.tempGenerator();
 	self.server = io(self.httpServer, {
-		path: '/server'
+		path: '/server',
+		wsEngine:'uws'
 	});
 	self.server.on('connect', function (sock) {
 		sock.emit('ready');
@@ -474,10 +484,34 @@ var c4serv = function (port,host,logfile) {
 				sock.emit('join-game', {error: "no-game-with-id", success: false});
 			}
 		});
+		sock.on('registerPublicGamesInterest',function(){
+			if(!_.includes(self.publicGamesListeners,sock)){
+				self.publicGamesListeners.push(sock);
+			}
+		});
 		sock.on('requestPublicGames',function(){
 			sock.emit('publicGames',self.publicGamesInfo);
+		});
+		sock.on('requestPublicGameId',function(data){
+			var pwd = data.password  || '';
+			if(!data.gameName){return;}
+			for(var x in self.publicGames){
+				var game = self.publicGames[x];
+				if(game.info.gameName == data.gameName){
+					if(!game.isPassworded){
+						sock.emit('publicGameId',game.info.gameId);
+					}else if(game.password == pwd){
+						sock.emit('publicGameId',game.info.gameId);
+					}
+				}
+			}
 		})
 	});
+	self.notifyAllPublicGamesListeners = function(){
+		for(var x in self.publicGamesListeners){
+			self.publicGamesListeners[x].emit('publicGames',self.publicGamesInfo);
+		}
+	};
 	self.createGame = function (data) {
 		var game;
 		var sd = function () {
@@ -492,7 +526,10 @@ var c4serv = function (port,host,logfile) {
 		game = new c4game(data.width, data.height, data.connect, gameId, data.keepPlaying, realGameName, sd, data.public);
 		if(game.public.public){
 			self.publicGames.push({info:game.publicGameInfo,password:game.public.password,isPassworded:!!game.public.password});
-			self.publicGamesInfo.push({info:game.publicGameInfo,isPassworded:!!game.public.password});
+			var pi = _.cloneDeep(game.publicGameInfo);
+			pi.gameId = '';
+			self.publicGamesInfo.push({info:pi,isPassworded:!!game.public.password});
+			self.notifyAllPublicGamesListeners();
 		}
 		self.games.push(game);
 		return game;
@@ -506,6 +543,7 @@ var c4serv = function (port,host,logfile) {
 				if(self.publicGames[x].info == game.publicGameInfo){
 					self.publicGames.splice(x,1);
 					self.publicGamesInfo.splice(x,1);
+					self.notifyAllPublicGamesListeners();
 				}
 			}
 		}
@@ -515,7 +553,7 @@ var c4serv = function (port,host,logfile) {
 	//Express routing
 	self.app.use(bodyParser.json());
 	self.app.use(bodyParser.urlencoded({extended: true}));
-	self.app.use(express.static('./client'));
+	self.app.use(express.static('./client',{redirect:false}));
 	self.app.post('/createGame/api',function(req,res){
 		var ip = req.headers['x-forwarded-for'] || req.connection.remoteAddress;
 		var timenow = Date.now();

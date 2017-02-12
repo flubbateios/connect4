@@ -114,13 +114,11 @@ var model = new function () {
 		$.ajax({
 			url: self.rootUrl+'/createGame/api',
 			error: function () {
-				console.log('Failed to make AJAX call to API.');
-				self.gameCreateStatus('Failed to make AJAX call to API');
+				self.gameCreateStatus('Failed to make POST request to API');
 			},
 			success: function (d) {
 				if (d.success) {
 					self.gameCreateStatus('<b>Game created successfully <br> Game ID</b> '+d.gameInfo.gameId + '<br> <b>Game Name</b> <br>'+ d.gameInfo.gameName);
-					console.log(d.gameInfo);
 				} else {
 					if(d.error == 'too-frequent'){
 						self.gameCreateStatus('Please try again in a few seconds - too many games are being created at the moment.');

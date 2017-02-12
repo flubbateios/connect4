@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+	<title>flubb Connect 4</title>
+	<link href="https://fonts.googleapis.com/css?family=Open+Sans:400,700" rel="stylesheet">
+	<link rel = "stylesheet" href = "lib/bootstrap.css">
+	<style>
+		body {
+			font-family: 'Open Sans', 'sans-serif';
+			background-color: #76c2d6;
+		}
+		.main-window{
+			margin:auto;
+			text-align:center;
+			width:40vw;
+		}
+		.license{
+			margin-top:30px;
+		}
+		.link-btn{
+			margin-bottom:10px;
+			margin-top:20px;
+		}
+	</style>
+</head>
+<body>
+<a href = "./gamesBrowser/" class = "btn btn-success" style="margin:10px 0 0 10px">Go back</a>
+<div class="main-window">
+	<h2>flubb Connect 4</h2>
+	This is a multiplayer Connect 4 implementation but it's fairly customizable. Board sizes up to 100 x 100 are currently allowed, and the amount that you need to connect is customizable.
+	This server has support for free for alls and you can choose whether to end the game after one person has won or not. Furthermore, there is a spectator client and winners of free for all games get redirected
+	there so they can watch. Contact me on Steam if you want to make a custom web client for this server and you want to use CORS. It's written in nodeJS and the client uses knockoutJS for pretty much everything.
+	All of the files are static and communication to the server is done through socket.io . The only HTTP API is the one to create a game. This specific server is hosted behind a reverse proxy handled by nginx.
+	The server I'm using is a Scaleway dedicated server with an Intel Atom c2550 (4x2.4ghz) and 8gb of DDR3 RAM.
+	<br />
+	<a href = "https://github.com/flubbateios/connect4" class = "btn btn-success link-btn">Github Repo (may or may not be out of date)</a><br />
+	<div style = "text-align:center" class = "license">Copyright © 2017 flubb / flubbateios.com - <strong><a href = "./license.html" target = "_blank">License</a></strong> (Opens in new tab)</div>
+</div>
+</body>
+</html>

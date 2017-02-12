@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+	<title>flubb connect 4</title>
+	<script src = "../lib/jquery-3.1.1.min.js"></script>
+	<script src = "../lib/knockout-3.4.1.js"></script>
+	<script src = "../lib/knockout.mapping-latest.js"></script>
+	<script src = "../lib/socket.io-1.4.5.js"></script>
+	<script src = "../lib/jqPlugins.js"></script>
+	<script src = "browser.js"></script>
+	<link rel = "stylesheet" href = "../lib/bootstrap.css">
+	<link rel = "stylesheet" href = "browser.css">
+</head>
+<body>
+<div class ="main-parent">
+	<div class = "sidebar">
+		<div class = "box-side">
+			<a class = "btn btn-success joinbtn" href = "https://flubbateios.com">Home</a>
+			<button class = "btn btn-success joinbtn" data-bind = "click:function(){window.location.href = rootUrl() + '/about.html'}">About</button>
+		</div>
+		<div class = "box-side">
+			<h3>Join (unlisted) Game by Id</h3>
+			<strong>Game Id: </strong><input data-bind = "textInput:side.gameId"><br />
+			<button class = "btn btn-success joinbtn" data-bind = "click:side.joinGameById">Play</button><br />
+			<button class = "btn btn-success joinbtn" data-bind = "click:side.specGameById">Spectate</button>
+		</div>
+		<div class = "box-side">
+			<h2>Filters</h2>
+			<strong>Hide games with Password:</strong><input type = "checkbox" data-bind="checked:filters.ignorePassword"><br />
+			<strong>Game Name:</strong><input data-bind="textInput:filters.gameName"><br />
+		</div>
+		<span class = "license" style = "color:#000000">Copyright © 2017 flubb / flubbateios.com - <strong><a href = "../license.html" target = "_blank">License</a></strong> (Opens in a new tab)</span>
+	</div>
+	<div class = "browser">
+		<div class = "games">
+			<!-- ko foreach: filteredGames -->
+			<div class = "gamelist-item" data-bind = "click:$root.selectGame,css:{'gamelist-selected':$root.selectedGame()[0]==$data}">
+				<span style = "display:inline-block;width:20px;"></span>
+				<span data-bind = "text:info.gameName"></span> - <span data-bind = "text:info.boardWidth() + '*' + info.boardHeight() + ' Connect ' + info.connect()"></span>
+				<span style = "display:inline-block;width:30px;"></span>
+				<span class = "icon" data-bind = "visible:isPassworded">&#xf200;</span>
+			</div>
+			<!-- /ko -->
+		</div>
+		<div class = "buttons">
+			<strong style = "font-size:25px;">Password:</strong>
+			<input data-bind = "textInput:joinPassword,enable:selectedGame()[0].isPassworded" style = "margin-right:20px;">
+			<button class = "btn btn-info browserbtn" data-bind = "click:playGame">Play</button>
+			<button class = "btn btn-info browserbtn" data-bind = "click:spectateGame">Spectate</button>
+		</div>
+	</div>
+</div>
+</body>
+</html>
