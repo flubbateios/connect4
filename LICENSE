@@ -1,4 +1,7 @@
 DOES NOT APPLY TO /node_modules or /client/lib
+If you wish to host your own server/client or make an alternative client
+for my server, you MUST include a fairly visible (use common sense) link on the client to
+https://flubbateios.com/connect4/
 
 Mozilla Public License Version 2.0
 ==================================
