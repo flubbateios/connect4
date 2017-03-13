@@ -17,7 +17,7 @@
 <div class = "main-parent" data-bind="visible:browserIsChrome">
 	<div class = "sidebar-parent">
 		<div class = "box-side">
-			<button class = "btn btn-info" style="width:100%" data-bind = "click:function(){window.location.href = rootUrl() + '/gamesBrowser/'}">Back to Games Browser</button>
+			<a class = "btn btn-info" style="width:100%" href="../gamesBrowser/">Back to Games Browser</a>
 		</div>
 		<div class = "player-setup box-side">
 			<strong>Game Id:</strong> <input  class = "playerSetup-input" data-bind = "textInput:playerSetup.gameId , disable:playerSetup.gameIdDisabled()||!playerSetup.inSetup() "><br />

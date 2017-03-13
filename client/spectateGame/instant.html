@@ -22,10 +22,11 @@
 <body>
 <div class = "main-parent" data-bind="visible:browserIsChrome">
 
-	<div class = "box-side">
-		<button class = "btn btn-info" style="width:100%" data-bind = "click:function(){window.location.href = rootUrl() + '/gamesBrowser/'}">Back to Games Browser</button>
-	</div>
+	
 	<div class = "sidebar-parent">
+		<div class = "box-side">
+			<a class = "btn btn-info" style="width:100%" href="../gamesBrowser/">Back to Games Browser</a>
+		</div>
 		<div class = "player-setup box-side">
 			<strong>Game Id:</strong> <input disabled  class = "playerSetup-input" data-bind = "textInput:playerSetup.gameId"><br />
 			<strong>Username:</strong> <input disabled class = "playerSetup-input" data-bind = "textInput:playerSetup.username"><br />

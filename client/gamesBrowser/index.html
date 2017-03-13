@@ -17,8 +17,10 @@
 	<div class = "sidebar">
 		<div class = "box-side">
 			<a class = "btn btn-success joinbtn" href = "https://flubbateios.com">Home</a>
-			<button class = "btn btn-success joinbtn" data-bind = "click:function(){window.location.href = rootUrl() + '/about.html'}">About</button>
+			<a class = "btn btn-success joinbtn" href="../about.html">About</a>
+			<a class ="btn btn-success joinbtn" href="https://github.com/flubbateios/connect4">Github</a>
 			<a class ="btn btn-success joinbtn" href="../createGame/">Create Game</a>
+			
 		</div>
 		<div class = "box-side">
 			<h3>Join (unlisted) Game by Id</h3>
@@ -35,6 +37,7 @@
 	</div>
 	<div class = "browser">
 		<div class = "games">
+		<span data-bind = "visible:filteredGames().length == 0">There are no public games right now :(</span>
 			<!-- ko foreach: filteredGames -->
 			<div class = "gamelist-item" data-bind = "click:$root.selectGame,css:{'gamelist-selected':$root.selectedGame()[0]==$data}">
 				<span style = "display:inline-block;width:20px;"></span>
