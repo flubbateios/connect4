@@ -553,7 +553,7 @@ var c4serv = function (port,host,logfile) {
 	//Express routing
 	self.app.use(bodyParser.json());
 	self.app.use(bodyParser.urlencoded({extended: true}));
-	self.app.use(express.static('./client',{redirect:false}));
+	self.app.use(express.static(__dirname + '/client',{redirect:false}));
 	self.app.post('/createGame/api',function(req,res){
 		var ip = req.headers['x-forwarded-for'] || req.connection.remoteAddress;
 		var timenow = Date.now();
